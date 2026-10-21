@@ -1,9 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:signalbait_mobile/widgets/main_layout.dart';
 
 void main() {
-  //The main script to run the application.
-  runApp(const SignalBaitApp()); 
+  // The main script to run the application.
+  runApp(const SignalBaitApp());
 }
 
 class SignalBaitApp extends StatelessWidget {
@@ -29,11 +30,8 @@ class ScannerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('SignalBait'),
-      ),
-      body: Padding(
+    return MainLayout(
+      child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +48,6 @@ class ScannerScreen extends StatelessWidget {
               'Check suspicious messages before you trust them.',
             ),
             const SizedBox(height: 24),
-
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -78,9 +75,7 @@ class ScannerScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 16),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(

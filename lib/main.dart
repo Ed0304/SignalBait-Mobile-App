@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:signalbait_mobile/widgets/main_layout.dart';
-
+import 'package:signalbait_mobile/router/app_router.dart';
 void main() {
   // The main script to run the application.
   runApp(const SignalBaitApp());
@@ -12,7 +12,9 @@ class SignalBaitApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    //MaterialApp.router asks the app to use the defined router.
+    //Normal MaterialApp uses 'home'
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -20,7 +22,7 @@ class SignalBaitApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const ScannerScreen(),
+      routerConfig: appRouter
     );
   }
 }

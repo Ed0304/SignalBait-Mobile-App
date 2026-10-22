@@ -17,7 +17,7 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
-
+  //underline before name turns this function to private.
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -26,6 +26,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    //Scaffold: The app's skeleton, describes the structure of the UI.
     return Scaffold(
       appBar: const Header(),
       body: widget.child,

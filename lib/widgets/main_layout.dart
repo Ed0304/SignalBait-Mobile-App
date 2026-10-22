@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'header.dart';
 import 'footer.dart';
+import 'package:go_router/go_router.dart';
 
 class MainLayout extends StatefulWidget {
   final Widget child;
@@ -19,9 +20,17 @@ class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
   //underline before name turns this function to private.
   void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    switch (index) {
+      case 0:
+        context.go('/scan');
+        break;
+      case 1:
+        context.go('/tickets');
+        break;
+      case 2:
+        context.go('/help');
+        break;
+    }
   }
 
   @override

@@ -16,6 +16,10 @@ class Footer extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
+
+      selectedItemColor: const Color(0xFF2459A9),
+      unselectedItemColor: Colors.grey,
+
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.shield_outlined),

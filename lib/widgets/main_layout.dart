@@ -1,10 +1,11 @@
 
 import 'package:flutter/material.dart';
-import 'header.dart';
-import 'footer.dart';
 import 'package:go_router/go_router.dart';
 
-class MainLayout extends StatefulWidget {
+import 'header.dart';
+import 'footer.dart';
+
+class MainLayout extends StatelessWidget {
   final Widget child;
 
   const MainLayout({
@@ -12,14 +13,8 @@ class MainLayout extends StatefulWidget {
     required this.child,
   });
 
-  @override
-  State<MainLayout> createState() => _MainLayoutState();
-}
-
-class _MainLayoutState extends State<MainLayout> {
-  int _currentIndex = 0;
-  //underline before name turns this function to private.
-  void _onTabTapped(int index) {
+  // Navigate to the route associated with the selected tab.
+  void _onTabTapped(BuildContext context, int index) {
     switch (index) {
       case 0:
         context.go('/scan');
@@ -35,13 +30,21 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
-    //Scaffold: The app's skeleton, describes the structure of the UI.
+    // Determine the selected tab from the current route.
+    final path = GoRouterState.of(context).uri.path;
+
+    final currentIndex = switch (path) {
+      '/tickets' => 1,
+      '/help' => 2,
+      _ => 0,
+    };
+
     return Scaffold(
       appBar: const Header(),
-      body: widget.child,
+      body: child,
       bottomNavigationBar: Footer(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
+        currentIndex: currentIndex,
+        onTap: (index) => _onTabTapped(context, index),
       ),
     );
   }

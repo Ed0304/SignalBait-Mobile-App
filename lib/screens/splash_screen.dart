@@ -7,6 +7,7 @@ class SplashScreen extends StatelessWidget{
     //Placeholder
     return Scaffold(
       body: Text("Will be added later.")
+      // TODO: Connect to Spring Boot API to get ticket info.
       );
   }
 

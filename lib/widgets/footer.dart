@@ -17,7 +17,7 @@ class Footer extends StatelessWidget {
       currentIndex: currentIndex,
       onTap: onTap,
 
-      selectedItemColor: const Color(0xFF2459A9),
+      selectedItemColor: Color(0xFF80FF80),
       unselectedItemColor: Colors.grey,
 
       items: const [

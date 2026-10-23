@@ -18,6 +18,7 @@ class _TicketScreenState extends State<TicketScreen> {
   static const Color _green = Color(0xFF80FF80);
   static const Color _muted = Color(0xFF9CA3AF);
   static const Color _warning = Color(0xFFFFCC00);
+  static const Color _error = Color(0xFFFF7777);
 
   final _submitFormKey = GlobalKey<FormState>();
   final _trackFormKey = GlobalKey<FormState>();
@@ -30,6 +31,12 @@ class _TicketScreenState extends State<TicketScreen> {
 
   bool _isSubmitting = false;
   bool _isTracking = false;
+
+  String? _submitMessage;
+  bool _submitSuccess = false;
+
+  String? _trackMessage;
+  bool _trackSuccess = false;
 
   Map<String, dynamic>? _createdTicket;
   Map<String, dynamic>? _trackedTicket;
@@ -55,6 +62,7 @@ class _TicketScreenState extends State<TicketScreen> {
     setState(() {
       _isSubmitting = true;
       _createdTicket = null;
+      _submitMessage = null;
     });
 
     try {
@@ -73,18 +81,30 @@ class _TicketScreenState extends State<TicketScreen> {
 
       if (response.statusCode == 201) {
         if (!mounted) return;
-        setState(() => _createdTicket = data);
-        _showMessage('Report submitted successfully!');
+
+        setState(() {
+          _createdTicket = data;
+          _submitSuccess = true;
+          _submitMessage =
+              'Please check your email for your ticket details.';
+        });
       } else {
         throw Exception(
           data['message']?.toString() ??
-              'Could not submit report (${response.statusCode}).',
+              'We could not submit your report. Please try again.',
         );
       }
     } catch (e) {
-      if (mounted) _showMessage(_friendlyError(e));
+      if (mounted) {
+        setState(() {
+          _submitSuccess = false;
+          _submitMessage = _friendlyError(e);
+        });
+      }
     } finally {
-      if (mounted) setState(() => _isSubmitting = false);
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -96,13 +116,18 @@ class _TicketScreenState extends State<TicketScreen> {
     );
 
     if (ticketNumber == null) {
-      _showMessage('Please enter a valid ticket number.');
+      setState(() {
+        _trackSuccess = false;
+        _trackMessage = 'Please enter a valid ticket number.';
+        _trackedTicket = null;
+      });
       return;
     }
 
     setState(() {
       _isTracking = true;
       _trackedTicket = null;
+      _trackMessage = null;
     });
 
     try {
@@ -121,17 +146,29 @@ class _TicketScreenState extends State<TicketScreen> {
 
       if (response.statusCode == 200) {
         if (!mounted) return;
-        setState(() => _trackedTicket = data);
+
+        setState(() {
+          _trackedTicket = data;
+          _trackSuccess = true;
+          _trackMessage = 'Your ticket was found successfully!';
+        });
       } else {
         throw Exception(
           data['message']?.toString() ??
-              'Ticket not found. Check the ticket number and email.',
+              'We could not find your ticket. Check the ticket number and email.',
         );
       }
     } catch (e) {
-      if (mounted) _showMessage(_friendlyError(e));
+      if (mounted) {
+        setState(() {
+          _trackSuccess = false;
+          _trackMessage = _friendlyError(e);
+        });
+      }
     } finally {
-      if (mounted) setState(() => _isTracking = false);
+      if (mounted) {
+        setState(() => _isTracking = false);
+      }
     }
   }
 
@@ -142,6 +179,7 @@ class _TicketScreenState extends State<TicketScreen> {
     } catch (_) {
       // The server may return a non-JSON error page.
     }
+
     return {};
   }
 
@@ -158,16 +196,6 @@ class _TicketScreenState extends State<TicketScreen> {
     }
 
     return message.replaceFirst('Exception: ', '');
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: _surface,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   String _formatDate(dynamic value) {
@@ -340,25 +368,32 @@ class _TicketScreenState extends State<TicketScreen> {
                         ),
                       ),
                     ),
+
+                    if (_submitMessage != null)
+                      _statusBanner(
+                        message: _submitMessage!,
+                        success: _submitSuccess,
+                        title: _submitSuccess ? 'Success!' : 'Request Failed',
+                      ),
+
                     if (_createdTicket != null) ...[
                       const SizedBox(height: 20),
                       _resultPanel(
-                        title: 'Report Submitted!',
+                        title: 'Ticket Details',
                         details: [
-                          _detail('Ticket Number', _createdTicket!['ticketNumber']),
-                          _detail('Issue Type', _issueTypes[
-                                  _createdTicket!['issueType']] ??
-                              _createdTicket!['issueType']),
+                          _detail(
+                            'Ticket Number',
+                            _createdTicket!['ticketNumber'],
+                          ),
+                          _detail(
+                            'Issue Type',
+                            _issueTypes[_createdTicket!['issueType']] ??
+                                _createdTicket!['issueType'],
+                          ),
                           _detail('Status', _createdTicket!['ticketStatus']),
                           _detail(
                             'Created',
                             _formatDate(_createdTicket!['createdAt']),
-                          ),
-                          _detail(
-                            'Confirmation Email',
-                            _createdTicket!['confirmationEmailSent'] == true
-                                ? 'Sent'
-                                : 'Not sent',
                           ),
                         ],
                       ),
@@ -431,15 +466,28 @@ class _TicketScreenState extends State<TicketScreen> {
                         ),
                       ),
                     ),
+
+                    if (_trackMessage != null)
+                      _statusBanner(
+                        message: _trackMessage!,
+                        success: _trackSuccess,
+                        title: _trackSuccess ? 'Success!' : 'Request Failed',
+                      ),
+
                     if (_trackedTicket != null) ...[
                       const SizedBox(height: 20),
                       _resultPanel(
                         title: 'Report Details',
                         details: [
-                          _detail('Ticket Number', _trackedTicket!['ticketNumber']),
-                          _detail('Issue Type', _issueTypes[
-                                  _trackedTicket!['issueType']] ??
-                              _trackedTicket!['issueType']),
+                          _detail(
+                            'Ticket Number',
+                            _trackedTicket!['ticketNumber'],
+                          ),
+                          _detail(
+                            'Issue Type',
+                            _issueTypes[_trackedTicket!['issueType']] ??
+                                _trackedTicket!['issueType'],
+                          ),
                           _detail('Status', _trackedTicket!['ticketStatus']),
                           _detail(
                             'Created',
@@ -455,6 +503,63 @@ class _TicketScreenState extends State<TicketScreen> {
             const SizedBox(height: 24),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _statusBanner({
+    required String title,
+    required String message,
+    required bool success,
+  }) {
+    final color = success ? _green : _error;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: color.withValues(alpha: 0.65),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            success ? Icons.check_circle : Icons.error,
+            color: color,
+            size: 32,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -486,7 +591,11 @@ class _TicketScreenState extends State<TicketScreen> {
           const SizedBox(height: 7),
           Text(
             subtitle,
-            style: const TextStyle(color: _muted, fontSize: 13, height: 1.4),
+            style: const TextStyle(
+              color: _muted,
+              fontSize: 13,
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 20),
           child,
@@ -525,7 +634,9 @@ class _TicketScreenState extends State<TicketScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+        borderSide: BorderSide(
+          color: Colors.white.withValues(alpha: 0.15),
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -585,7 +696,10 @@ class _TicketScreenState extends State<TicketScreen> {
         children: [
           Expanded(
             flex: 2,
-            child: Text(label, style: const TextStyle(color: _muted)),
+            child: Text(
+              label,
+              style: const TextStyle(color: _muted),
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(

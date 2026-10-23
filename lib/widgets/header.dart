@@ -20,8 +20,8 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
         ],
         //Similar to CSS, describe the colors, size, etc.
       ),
-      backgroundColor: const Color(0xFF2459A9),
-      foregroundColor: Colors.white,
+      backgroundColor: const Color(0xFF151515),
+      foregroundColor: Color(0xFF80FF80),
       elevation: 0,
     );
   }

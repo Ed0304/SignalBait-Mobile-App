@@ -16,10 +16,13 @@ class SignalBaitApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2459A9),
+        brightness: Brightness.dark,
+        fontFamily: 'JetBrainsMono',
+        scaffoldBackgroundColor: const Color(0xFF0D0D0D),
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF80FF80),
+          surface: Color(0xFF151515),
         ),
-        useMaterial3: true,
       ),
       routerConfig: appRouter
     );
